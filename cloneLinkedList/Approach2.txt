@@ -1,0 +1,108 @@
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+        self.arb = None
+
+
+class Solution:
+    def insert_at_tail(self, head, tail, d):
+        new_node = Node(d)
+        if head is None:
+            head = new_node
+            tail = new_node
+        else:
+            tail.next = new_node
+            tail = new_node
+        return head, tail
+
+    def print_list(self, head):
+        while head:
+            print(head.data, end=" ")
+            head = head.next
+        print()
+
+    def print_random(self, head):
+        while head:
+            print("head data:", head.data, end=" ")
+            if head.arb:
+                print("head random data:", head.arb.data)
+            else:
+                print("head random data: None")
+            head = head.next
+            print()
+
+    def copy_list(self, head):
+        # Step 1: Create a Clone List
+        clone_head = None
+        clone_tail = None
+
+        temp = head
+        while temp:
+            clone_head, clone_tail = self.insert_at_tail(clone_head, clone_tail, temp.data)
+            temp = temp.next
+
+        # Step 2: Insert nodes of Clone List in between originalList
+        original_node = head
+        clone_node = clone_head
+
+        while original_node and clone_node:
+            next_node = original_node.next
+            original_node.next = clone_node
+            original_node = next_node
+
+            next_node = clone_node.next
+            clone_node.next = original_node
+            clone_node = next_node
+
+        # Step 3: Random pointer copy
+        original_node = head
+        clone_node = clone_head
+
+        while original_node and clone_node:
+            if original_node.arb:
+                clone_node.arb = original_node.arb.next
+            else:
+                clone_node.arb = None
+
+            clone_node = clone_node.next
+            original_node = original_node.next
+
+        # Step 4: Revert Step 2 changes
+        original = head
+        copy = clone_head
+
+        while original and copy:
+            original.next = original.next.next if original.next else original.next
+            copy.next = copy.next.next if copy.next else copy.next
+            original = original.next
+            copy = copy.next
+
+        # Step 5: Return the cloned list head
+        return clone_head
+
+
+# Sample usage:
+if __name__ == "__main__":
+    solution = Solution()
+
+    # Create a sample linked list
+    head = Node(1)
+    head.next = Node(2)
+    head.next.next = Node(3)
+
+    head.arb = head.next.next  # Random pointer from 1 to 3
+    head.next.arb = head  # Random pointer from 2 to 1
+
+    print("Original Linked List:")
+    solution.print_list(head)
+    print("Random Pointers:")
+    solution.print_random(head)
+
+    # Copy the linked list
+    clone_head = solution.copy_list(head)
+
+    print("Cloned Linked List:")
+    solution.print_list(clone_head)
+    print("Random Pointers in Cloned List:")
+    solution.print_random(clone_head)
